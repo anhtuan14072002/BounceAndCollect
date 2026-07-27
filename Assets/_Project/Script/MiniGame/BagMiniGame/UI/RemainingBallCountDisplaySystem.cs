@@ -13,7 +13,7 @@ public partial class RemainingBallCountDisplaySystem : SystemBase
     protected override void OnCreate()
     {
         base.OnCreate();
-        var textGameObject = GameObject.Find("TextAmount");
+        var textGameObject = GameObject.Find("CounterText");
         if (textGameObject != null)
         {
             _textMeshProUGUI = textGameObject.GetComponent<TextMeshProUGUI>();
