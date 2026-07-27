@@ -36,8 +36,9 @@ namespace Wizard
             {
                 Entity createStone = ecb.Instantiate(miniStoneComponent.EntityStone);
                 ecb.SetComponent(createStone, LocalTransform.FromPositionRotationScale(
-                    localTransform.ValueRO.Position, quaternion.identity, 0.3f));
+                    localTransform.ValueRO.Position + new float3(0f, -1.1f, 0f), quaternion.identity, 0.3f));
 
+                ecb.AddComponent<BallTag>(createStone);
                 ecb.AddBuffer<PadJumpHistoryBufferElement>(createStone);
                 ecb.AddBuffer<PadMultiplierHistoryBufferElement>(createStone);
                 miniStoneComponent.Amount--;

@@ -7,7 +7,7 @@ using UnityEngine;
 [BurstCompile]
 public partial class RemainingBallCountDisplaySystem : SystemBase
 {
-    private TextMeshProUGUI _textMeshProUGUI;
+    private TextMeshPro _textMeshPro;
     private RectTransform _rectTransform;
 
     protected override void OnCreate()
@@ -16,24 +16,24 @@ public partial class RemainingBallCountDisplaySystem : SystemBase
         var textGameObject = GameObject.Find("CounterText");
         if (textGameObject != null)
         {
-            _textMeshProUGUI = textGameObject.GetComponent<TextMeshProUGUI>();
+            _textMeshPro = textGameObject.GetComponent<TextMeshPro>();
         }
     }
 
     protected override void OnUpdate()
     {
-        if (_textMeshProUGUI == null) return;
+        if (_textMeshPro == null) return;
         Entities
             .WithAll<Wizard.BallSpawnConfigComponent>()
             .ForEach((in Wizard.BallSpawnConfigComponent amount) =>
             {
-                _textMeshProUGUI.text = $"{amount.Amount}";
+                _textMeshPro.text = $"{amount.Amount}";
             }).WithoutBurst().Run();
         Entities
             .WithAll<Wizard.SourceCupComponent>()
             .ForEach((in LocalTransform localTransform) =>
             {
-                _textMeshProUGUI.transform.position = localTransform.Position;
+                _textMeshPro.transform.position = localTransform.Position;
             }).WithoutBurst().Run();
         
     }

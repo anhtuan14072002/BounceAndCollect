@@ -60,7 +60,7 @@ namespace Wizard
             var textMeshObj = Instantiate(textMeshPrefab, position, Quaternion.identity);
             textMeshObj.name = $"MultiNumber_{entityId}";
 
-            if (textMeshObj.TryGetComponent<TextMeshProUGUI>(out var textMeshPro))
+            if (textMeshObj.TryGetComponent<TextMeshPro>(out var textMeshPro))
             {
                 textMeshPro.text = $"x{multiNumber}";
             }
@@ -72,7 +72,7 @@ namespace Wizard
         {
             textMeshObj.transform.position = position;
 
-            if (textMeshObj.TryGetComponent<TextMeshProUGUI>(out var textMeshPro))
+            if (textMeshObj.TryGetComponent<TextMeshPro>(out var textMeshPro))
             {
                 textMeshPro.text = $"x{multiNumber}";
             }

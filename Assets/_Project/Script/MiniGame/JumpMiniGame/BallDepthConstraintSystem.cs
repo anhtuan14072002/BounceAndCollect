@@ -1,18 +1,17 @@
-using Unity.CharacterController;
 using Unity.Entities;
+using Unity.Physics;
 using Unity.Physics.Systems;
 
 namespace Wizard
 {
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
-    [UpdateBefore(typeof(KinematicCharacterPhysicsUpdateGroup))]
     public partial struct BallDepthConstraintSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var ball in SystemAPI.Query<RefRW<KinematicCharacterBody>>())
+            foreach (var velocity in SystemAPI.Query<RefRW<PhysicsVelocity>>().WithAll<BallTag>())
             {
-                ball.ValueRW.RelativeVelocity.z = 0f;
+                velocity.ValueRW.Linear.z = 0f;
             }
         }
     }

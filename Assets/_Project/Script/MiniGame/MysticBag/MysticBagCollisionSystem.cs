@@ -23,7 +23,8 @@ namespace Wizard
                 {
                     var otherEntity = triggerEvent.GetOtherEntity(bagEntity);
 
-                    if (triggerEvent.State == StatefulEventState.Enter)
+                    if (triggerEvent.State == StatefulEventState.Enter &&
+                        SystemAPI.HasComponent<BallTag>(otherEntity))
                     {
                         mysticBag.ValueRW.MysticStone++;
 

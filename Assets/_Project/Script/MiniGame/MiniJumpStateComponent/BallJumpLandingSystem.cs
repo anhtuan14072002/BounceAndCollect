@@ -1,33 +1,33 @@
-/*using Unity.CharacterController;
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
 using Unity.Physics.Systems;
-using UnityEngine;
+
 namespace Wizard
 {
+    [BurstCompile]
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
+    [UpdateAfter(typeof(PadJumpSystem))]
     public partial struct BallJumpLandingSystem : ISystem
     {
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.TempJob);
+            var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-            foreach (var (stateJump, kineBody, entity) in SystemAPI
-                         .Query<BallJumpStateComponent, KinematicCharacterBody>().WithEntityAccess())
+            foreach (var (jumpState, velocity, collider, entity) in SystemAPI
+                         .Query<RefRO<BallJumpStateComponent>, RefRO<PhysicsVelocity>, RefRW<PhysicsCollider>>()
+                         .WithEntityAccess())
             {
-                if (!stateJump.JumpState || kineBody.RelativeVelocity.y >= 0) continue;
+                if (velocity.ValueRO.Linear.y >= 0f) continue;
 
-                var collider = SystemAPI.GetComponent<PhysicsCollider>(entity);
-                collider.Value.Value.SetCollisionFilter(new CollisionFilter
-                {
-                    BelongsTo = 1u << LayerMask.NameToLayer("Stone"),
-                    CollidesWith = ~0u
-                });
-                SystemAPI.SetComponent(entity, collider);
+                collider.ValueRW.Value.Value.SetCollisionFilter(jumpState.ValueRO.OriginalFilter);
                 ecb.RemoveComponent<BallJumpStateComponent>(entity);
             }
+
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
         }
     }
-}*/
+}

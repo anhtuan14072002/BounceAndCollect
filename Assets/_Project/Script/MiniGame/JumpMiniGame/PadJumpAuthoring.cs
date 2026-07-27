@@ -21,7 +21,8 @@ namespace Wizard
                     PadId = authoring.padId,
                     JumpForceXMin = authoring.jumpForceXMin,
                     JumpForceXMax = authoring.jumpForceXMax
-                }); }
+                });
+            }
         }
     }
 }

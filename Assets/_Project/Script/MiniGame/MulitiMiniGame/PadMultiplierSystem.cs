@@ -3,14 +3,12 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics.Stateful;
 using Unity.Physics.Systems;
-using Unity.CharacterController;
 using Unity.Transforms;
 
 namespace Wizard
 {
     [BurstCompile]
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
-    [UpdateBefore(typeof(KinematicCharacterPhysicsUpdateGroup))]
     public partial struct PadMultiplierSystem : ISystem
     {
         public void OnCreate(ref SystemState state)
@@ -34,14 +32,12 @@ namespace Wizard
                     Entity otherEntity = triggerEvent.GetOtherEntity(entity);
 
                     if (triggerEvent.State != StatefulEventState.Enter) continue;
-
+                    if (!SystemAPI.HasComponent<BallTag>(otherEntity) ||
+                        !SystemAPI.HasComponent<LocalTransform>(otherEntity) ||
+                        !SystemAPI.HasBuffer<PadJumpHistoryBufferElement>(otherEntity) ||
+                        !SystemAPI.HasBuffer<PadMultiplierHistoryBufferElement>(otherEntity)) continue;
 
                     float3 hitPosition = SystemAPI.GetComponent<LocalTransform>(otherEntity).Position;
-                    if (!SystemAPI.HasBuffer<PadMultiplierHistoryBufferElement>(otherEntity))
-                    {
-                        state.EntityManager.AddBuffer<PadMultiplierHistoryBufferElement>(otherEntity);
-                    }
-
                     var jumpBuffer = SystemAPI.GetBuffer<PadJumpHistoryBufferElement>(otherEntity);
                     var ballBuffer = SystemAPI.GetBuffer<PadMultiplierHistoryBufferElement>(otherEntity);
                     bool alreadyMulti = false;
@@ -54,6 +50,7 @@ namespace Wizard
                     }
 
                     if (alreadyMulti) continue;
+                    ballBuffer.Add(new PadMultiplierHistoryBufferElement { PadId = multi.PadId });
                     for (int j = 1; j < multi.MultiNumber; j++)
                     {
                         float angle = (2 * math.PI / multi.MultiNumber) * j;
@@ -69,6 +66,7 @@ namespace Wizard
                             Rotation = quaternion.identity,
                             Scale = 0.3f,
                         });
+                        ecb.AddComponent<BallTag>(multiStone);
                         var multiCheckBuffer = ecb.AddBuffer<PadMultiplierHistoryBufferElement>(multiStone);
                         multiCheckBuffer.Add(new PadMultiplierHistoryBufferElement { PadId = multi.PadId });
 
