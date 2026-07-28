@@ -786,8 +786,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   padRandom: {fileID: 245186973}
   initializedUniformScale:
-    x: 1
-    y: 1
+    x: 5.365048
+    y: 0
     z: 1
   targetUniformScale:
     x: 5.365048
@@ -1091,7 +1091,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &315670027
 Transform:
   m_ObjectHideFlags: 0
@@ -1820,7 +1820,7 @@ Transform:
   m_GameObject: {fileID: 516208296}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0631, y: 1, z: -0.49}
+  m_LocalPosition: {x: 0.0631, y: 1, z: -0.52}
   m_LocalScale: {x: 9.128143, y: 16, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4306,7 +4306,7 @@ MonoBehaviour:
     y: 12
     z: 0
   padId: 4
-  jumpForceXMin: -3
+  jumpForceXMin: -7
   jumpForceXMax: 6
 --- !u!114 &1062083424
 MonoBehaviour:
@@ -6023,8 +6023,8 @@ Transform:
   m_GameObject: {fileID: 1920201596}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 8.1377, z: 0}
-  m_LocalScale: {x: 1.95, y: 1.735488, z: 1}
+  m_LocalPosition: {x: 0.0563, y: 8.5057, z: 0}
+  m_LocalScale: {x: 1.0808184, y: 0.9992443, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 967139466}
@@ -6091,7 +6091,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -6116,6 +6116,67 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stonePrefab: {fileID: 8544706995889678869, guid: f7bec1a79be6db74cb93bdd7fad990e0, type: 3}
+  trail:
+    Enabled: 1
+    Material: {fileID: 2100000, guid: fc6e6ea9bd8e06943a232bac496e0eef, type: 2}
+    Lifetime: 0.3
+    WidthMultiplier: 0.28
+    WidthOverLifetime:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: -1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: -1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ColorOverLifetime:
+      serializedVersion: 2
+      key0: {r: 0.75, g: 0.95, b: 1, a: 0.65}
+      key1: {r: 0.75, g: 0.95, b: 1, a: 0}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    MaxPoints: 8
+    MinPointDistance: 0.03
   amount: 100
   spawnedAmount: 1
   elapsedTime: 0.25
