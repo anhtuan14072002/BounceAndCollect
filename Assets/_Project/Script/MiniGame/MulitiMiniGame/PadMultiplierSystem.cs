@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -13,10 +14,12 @@ namespace Wizard
     public partial struct PadMultiplierSystem : ISystem
     {
         private float _ballSeparation;
+        private EntityQuery _poolQuery;
 
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<BallSpawnConfigComponent>();
+            _poolQuery = BallPool.CreateQuery(ref state);
         }
 
         [BurstCompile]
@@ -36,6 +39,8 @@ namespace Wizard
                     math.max(ballAabb.Extents.x, ballAabb.Extents.y) * separationMargin;
             }
 
+            NativeArray<Entity> pooledBalls = default;
+            int poolIndex = 0;
             foreach (var (multi, triggerEventsBuffer, entity) in SystemAPI
                          .Query<PadMultiplierComponent, DynamicBuffer<StatefulTriggerEvent>>()
                          .WithEntityAccess())
@@ -70,6 +75,8 @@ namespace Wizard
                     float neighborSafeRadius =
                         _ballSeparation / (2f * math.sin(math.PI / multi.MultiNumber));
                     float spawnRadius = math.max(multi.Radius, math.max(_ballSeparation, neighborSafeRadius));
+                    if (!pooledBalls.IsCreated)
+                        pooledBalls = _poolQuery.ToEntityArray(Allocator.Temp);
 
                     for (int j = 1; j < multi.MultiNumber; j++)
                     {
@@ -79,7 +86,8 @@ namespace Wizard
 
                         float3 positionMulti = hitPosition + new float3(xOffset, yOffset, 0);
 
-                        Entity multiStone = ecb.Instantiate(miniStoneComponent.EntityStone);
+                        Entity multiStone =
+                            BallPool.Get(miniStoneComponent.EntityStone, pooledBalls, ref poolIndex, ref ecb);
                         var spawnTransform = new LocalTransform
                         {
                             Position = positionMulti,
@@ -93,15 +101,11 @@ namespace Wizard
                                 new float3(spawnTransform.Scale))
                         });
                         ecb.SetComponent(multiStone, sourceVelocity);
-                        ecb.AddComponent<BallTag>(multiStone);
-                        ecb.AddBuffer<BallTrailPoint>(multiStone);
-                        var multiCheckBuffer = ecb.AddBuffer<PadMultiplierHistoryBufferElement>(multiStone);
-                        multiCheckBuffer.Add(new PadMultiplierHistoryBufferElement { PadId = multi.PadId });
-
-                        var newJumpBuffer = ecb.AddBuffer<PadJumpHistoryBufferElement>(multiStone);
+                        ecb.AppendToBuffer(multiStone,
+                            new PadMultiplierHistoryBufferElement { PadId = multi.PadId });
                         for (int k = 0; k < jumpBuffer.Length; k++)
                         {
-                            newJumpBuffer.Add(jumpBuffer[k]);
+                            ecb.AppendToBuffer(multiStone, jumpBuffer[k]);
                         }
                     }
 
@@ -115,6 +119,8 @@ namespace Wizard
                     }
                 }
             }
+            if (pooledBalls.IsCreated)
+                pooledBalls.Dispose();
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
         }

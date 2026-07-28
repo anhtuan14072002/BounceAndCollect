@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 
 namespace Wizard
@@ -10,11 +11,13 @@ namespace Wizard
     public partial struct BallSpawnSystem : ISystem
     {
         private float _timer;
+        private EntityQuery _poolQuery;
 
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<BallSpawnConfigComponent>();
             state.RequireForUpdate<SourceCupDragComponent>();
+            _poolQuery = BallPool.CreateQuery(ref state);
         }
 
         public void OnUpdate(ref SystemState state)
@@ -32,9 +35,12 @@ namespace Wizard
 
             Entity miniStoneEntity = SystemAPI.GetSingletonEntity<BallSpawnConfigComponent>();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            using NativeArray<Entity> pooledBalls = _poolQuery.ToEntityArray(Allocator.Temp);
+            int poolIndex = 0;
             foreach (var localTransform in SystemAPI.Query<RefRO<LocalTransform>>().WithAll<SourceCupComponent>())
             {
-                Entity createStone = ecb.Instantiate(miniStoneComponent.EntityStone);
+                Entity createStone =
+                    BallPool.Get(miniStoneComponent.EntityStone, pooledBalls, ref poolIndex, ref ecb);
                 LocalTransform spawnTransform = LocalTransform.FromPositionRotationScale(
                     localTransform.ValueRO.Position + new float3(0f, -1.1f, 0f), quaternion.identity, 0.3f);
                 ecb.SetComponent(createStone, spawnTransform);
@@ -44,10 +50,7 @@ namespace Wizard
                         new float3(spawnTransform.Scale))
                 });
 
-                ecb.AddComponent<BallTag>(createStone);
-                ecb.AddBuffer<BallTrailPoint>(createStone);
-                ecb.AddBuffer<PadJumpHistoryBufferElement>(createStone);
-                ecb.AddBuffer<PadMultiplierHistoryBufferElement>(createStone);
+                ecb.SetComponent(createStone, default(PhysicsVelocity));
                 miniStoneComponent.Amount--;
                 SystemAPI.SetComponent(miniStoneEntity, miniStoneComponent);
                 if (miniStoneComponent.Amount == 0)

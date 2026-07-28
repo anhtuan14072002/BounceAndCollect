@@ -1,5 +1,6 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
+using Unity.Physics;
 using Unity.Physics.Stateful;
 
 namespace Wizard
@@ -10,13 +11,15 @@ namespace Wizard
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<MysticBagComponent>();
+            state.RequireForUpdate<CollectedBallCountComponent>();
         }
 
         public void OnUpdate(ref SystemState state)
         {
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.TempJob);
-            foreach (var (mysticBag, triggerEventsBuffer, bagEntity) in SystemAPI
-                         .Query<RefRW<MysticBagComponent>, DynamicBuffer<StatefulTriggerEvent>>()
+            foreach (var (collectedBallCount, triggerEventsBuffer, bagEntity) in SystemAPI
+                         .Query<RefRW<CollectedBallCountComponent>, DynamicBuffer<StatefulTriggerEvent>>()
+                         .WithAll<MysticBagComponent>()
                          .WithEntityAccess())
             {
                 foreach (var triggerEvent in triggerEventsBuffer)
@@ -26,9 +29,19 @@ namespace Wizard
                     if (triggerEvent.State == StatefulEventState.Enter &&
                         SystemAPI.HasComponent<BallTag>(otherEntity))
                     {
-                        mysticBag.ValueRW.MysticStone++;
+                        collectedBallCount.ValueRW.Value++;
 
-                        ecb.DestroyEntity(otherEntity);
+                        if (SystemAPI.HasComponent<BallJumpStateComponent>(otherEntity))
+                        {
+                            BallJumpStateComponent jumpState =
+                                SystemAPI.GetComponent<BallJumpStateComponent>(otherEntity);
+                            PhysicsCollider collider = SystemAPI.GetComponent<PhysicsCollider>(otherEntity);
+                            collider.Value.Value.SetCollisionFilter(jumpState.OriginalFilter);
+                            ecb.SetComponent(otherEntity, collider);
+                            ecb.RemoveComponent<BallJumpStateComponent>(otherEntity);
+                        }
+
+                        ecb.AddComponent<Disabled>(otherEntity);
                     }
                 }
             }

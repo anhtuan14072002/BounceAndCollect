@@ -20,6 +20,7 @@ namespace Wizard
                         MysticStone = authoring._initialStones
                     }
                 );
+                AddComponent<CollectedBallCountComponent>(entity);
             }
         }
     }
