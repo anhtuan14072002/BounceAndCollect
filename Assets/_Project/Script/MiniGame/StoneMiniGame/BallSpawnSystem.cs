@@ -35,10 +35,17 @@ namespace Wizard
             foreach (var localTransform in SystemAPI.Query<RefRO<LocalTransform>>().WithAll<SourceCupComponent>())
             {
                 Entity createStone = ecb.Instantiate(miniStoneComponent.EntityStone);
-                ecb.SetComponent(createStone, LocalTransform.FromPositionRotationScale(
-                    localTransform.ValueRO.Position + new float3(0f, -1.1f, 0f), quaternion.identity, 0.3f));
+                LocalTransform spawnTransform = LocalTransform.FromPositionRotationScale(
+                    localTransform.ValueRO.Position + new float3(0f, -1.1f, 0f), quaternion.identity, 0.3f);
+                ecb.SetComponent(createStone, spawnTransform);
+                ecb.SetComponent(createStone, new LocalToWorld
+                {
+                    Value = float4x4.TRS(spawnTransform.Position, spawnTransform.Rotation,
+                        new float3(spawnTransform.Scale))
+                });
 
                 ecb.AddComponent<BallTag>(createStone);
+                ecb.AddBuffer<BallTrailPoint>(createStone);
                 ecb.AddBuffer<PadJumpHistoryBufferElement>(createStone);
                 ecb.AddBuffer<PadMultiplierHistoryBufferElement>(createStone);
                 miniStoneComponent.Amount--;

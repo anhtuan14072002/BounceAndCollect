@@ -80,14 +80,21 @@ namespace Wizard
                         float3 positionMulti = hitPosition + new float3(xOffset, yOffset, 0);
 
                         Entity multiStone = ecb.Instantiate(miniStoneComponent.EntityStone);
-                        ecb.SetComponent(multiStone, new LocalTransform
+                        var spawnTransform = new LocalTransform
                         {
                             Position = positionMulti,
                             Rotation = quaternion.identity,
                             Scale = ballScale,
+                        };
+                        ecb.SetComponent(multiStone, spawnTransform);
+                        ecb.SetComponent(multiStone, new LocalToWorld
+                        {
+                            Value = float4x4.TRS(spawnTransform.Position, spawnTransform.Rotation,
+                                new float3(spawnTransform.Scale))
                         });
                         ecb.SetComponent(multiStone, sourceVelocity);
                         ecb.AddComponent<BallTag>(multiStone);
+                        ecb.AddBuffer<BallTrailPoint>(multiStone);
                         var multiCheckBuffer = ecb.AddBuffer<PadMultiplierHistoryBufferElement>(multiStone);
                         multiCheckBuffer.Add(new PadMultiplierHistoryBufferElement { PadId = multi.PadId });
 
