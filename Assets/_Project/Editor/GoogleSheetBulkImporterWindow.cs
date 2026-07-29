@@ -476,6 +476,13 @@ namespace Wizard.Editor
                     "Column resize self-check failed.");
             }
 
+            if (GoogleSheetGridGUI.ResizeRow(25f, 10f) != 45f ||
+                GoogleSheetGridGUI.ResizeRow(25f, -10f) != 20f)
+            {
+                throw new InvalidOperationException(
+                    "Row resize self-check failed.");
+            }
+
             Debug.Log("Google Sheet Bulk Importer self-check passed.");
         }
     }
@@ -487,7 +494,7 @@ namespace Wizard.Editor
         private const int MinimumRowCount = 20;
         private const float RowNumberWidth = 62f;
         private const float DefaultColumnWidth = 140f;
-        private const float RowHeight = 25f;
+        private const float DefaultRowHeight = 25f;
 
         private static readonly string[] Aliases =
         {
@@ -502,6 +509,7 @@ namespace Wizard.Editor
         [SerializeField] private int selectedColumn;
         [SerializeField] private string search;
         [SerializeField] private List<float> columnWidths = new();
+        [SerializeField] private List<float> rowHeights = new();
 
         private Vector2 scroll;
 
@@ -597,6 +605,8 @@ namespace Wizard.Editor
 
             Undo.RecordObject(config, "Remove bulk import row");
             config.Items.RemoveAt(selectedRow);
+            if (selectedRow < rowHeights.Count)
+                rowHeights.RemoveAt(selectedRow);
             selectedRow = Mathf.Clamp(selectedRow, 0, config.Items.Count - 1);
             EditorUtility.SetDirty(config);
         }
@@ -616,7 +626,7 @@ namespace Wizard.Editor
                 value = EditorGUILayout.TextField(
                     value,
                     GoogleSheetGridGUI.FormulaStyle,
-                    GUILayout.Height(RowHeight));
+                    GUILayout.Height(DefaultRowHeight));
                 if (EditorGUI.EndChangeCheck())
                     SetCellText(selectedRow, selectedColumn, value);
             }
@@ -631,17 +641,28 @@ namespace Wizard.Editor
                 columnWidths,
                 ColumnCount,
                 DefaultColumnWidth);
+            GoogleSheetGridGUI.EnsureRowHeights(
+                rowHeights,
+                rowCount,
+                DefaultRowHeight);
             float width = RowNumberWidth +
                           GoogleSheetGridGUI.GetTotalWidth(
                               columnWidths,
                               ColumnCount);
-            float height = (rowCount + 2) * RowHeight;
+            float height = DefaultRowHeight * 2f +
+                           GoogleSheetGridGUI.GetTotalHeight(
+                               rowHeights,
+                               rowCount);
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
             Rect canvas = GUILayoutUtility.GetRect(width, height);
 
             DrawHeaderCell(
-                new Rect(canvas.x, canvas.y, RowNumberWidth, RowHeight),
+                new Rect(
+                    canvas.x,
+                    canvas.y,
+                    RowNumberWidth,
+                    DefaultRowHeight),
                 "Alias");
 
             for (int column = 0; column < ColumnCount; column++)
@@ -653,9 +674,9 @@ namespace Wizard.Editor
             DrawHeaderCell(
                 new Rect(
                     canvas.x,
-                    canvas.y + RowHeight,
+                    canvas.y + DefaultRowHeight,
                     RowNumberWidth,
-                    RowHeight),
+                    DefaultRowHeight),
                 string.Empty);
 
             for (int column = 0; column < ColumnCount; column++)
@@ -678,14 +699,28 @@ namespace Wizard.Editor
 
             for (int row = 0; row < rowCount; row++)
             {
+                float rowY = canvas.y + DefaultRowHeight * 2f +
+                             GoogleSheetGridGUI.GetRowOffset(
+                                 rowHeights,
+                                 row);
+                Rect rowRect = new(
+                    canvas.x,
+                    rowY,
+                    width,
+                    rowHeights[row]);
                 GoogleSheetGridGUI.DrawHeaderCell(
                     new Rect(
                         canvas.x,
-                        canvas.y + (row + 2) * RowHeight,
+                        rowY,
                         RowNumberWidth,
-                        RowHeight),
+                        rowHeights[row]),
                     (row + 1).ToString(),
                     row == selectedRow);
+                GoogleSheetGridGUI.HandleRowResize(
+                    rowRect,
+                    row,
+                    rowHeights,
+                    Repaint);
 
                 for (int column = 0; column < ColumnCount; column++)
                     DrawDataCell(GetCellRect(canvas, row, column), row, column);
@@ -736,12 +771,20 @@ namespace Wizard.Editor
 
         private Rect GetCellRect(Rect canvas, int row, int column)
         {
+            float y = row < 0
+                ? canvas.y + (row + 2) * DefaultRowHeight
+                : canvas.y + DefaultRowHeight * 2f +
+                  GoogleSheetGridGUI.GetRowOffset(rowHeights, row);
+            float height = row < 0
+                ? DefaultRowHeight
+                : rowHeights[row];
+
             return new Rect(
                 canvas.x + RowNumberWidth +
                 GoogleSheetGridGUI.GetColumnOffset(columnWidths, column),
-                canvas.y + (row + 2) * RowHeight,
+                y,
                 columnWidths[column],
-                RowHeight);
+                height);
         }
 
         private string GetCellText(int row, int column)
@@ -846,10 +889,13 @@ namespace Wizard.Editor
     internal static class GoogleSheetGridGUI
     {
         private const float MinimumColumnWidth = 40f;
+        private const float MinimumRowHeight = 20f;
         private const float ResizeHandleWidth = 14f;
         private const float ResizeSensitivity = 2f;
         private static readonly int ColumnResizeHint =
             "GoogleSheetColumnResize".GetHashCode();
+        private static readonly int RowResizeHint =
+            "GoogleSheetRowResize".GetHashCode();
 
         private static readonly Color TabBarColor = new(0.055f, 0.055f, 0.055f, 1f);
         private static readonly Color TabColor = new(0.18f, 0.18f, 0.18f, 1f);
@@ -877,6 +923,15 @@ namespace Wizard.Editor
                 widths.Add(defaultWidth);
         }
 
+        public static void EnsureRowHeights(
+            List<float> heights,
+            int count,
+            float defaultHeight)
+        {
+            while (heights.Count < count)
+                heights.Add(defaultHeight);
+        }
+
         public static float GetTotalWidth(List<float> widths, int count)
         {
             float width = 0f;
@@ -891,6 +946,24 @@ namespace Wizard.Editor
             float offset = 0f;
             for (int i = 0; i < column; i++)
                 offset += widths[i];
+
+            return offset;
+        }
+
+        public static float GetTotalHeight(List<float> heights, int count)
+        {
+            float height = 0f;
+            for (int i = 0; i < count; i++)
+                height += heights[i];
+
+            return height;
+        }
+
+        public static float GetRowOffset(List<float> heights, int row)
+        {
+            float offset = 0f;
+            for (int i = 0; i < row; i++)
+                offset += heights[i];
 
             return offset;
         }
@@ -950,6 +1023,63 @@ namespace Wizard.Editor
             return Mathf.Max(
                 MinimumColumnWidth,
                 width + delta * ResizeSensitivity);
+        }
+
+        public static void HandleRowResize(
+            Rect rowRect,
+            int row,
+            List<float> heights,
+            Action repaint)
+        {
+            Rect resizeRect = new(
+                rowRect.x,
+                rowRect.yMax - ResizeHandleWidth * 0.5f,
+                rowRect.width,
+                ResizeHandleWidth);
+            EditorGUIUtility.AddCursorRect(
+                resizeRect,
+                MouseCursor.ResizeVertical);
+
+            int controlId = GUIUtility.GetControlID(
+                RowResizeHint + row,
+                FocusType.Passive,
+                resizeRect);
+            Event current = Event.current;
+
+            switch (current.GetTypeForControl(controlId))
+            {
+                case EventType.MouseDown
+                    when current.button == 0 &&
+                         resizeRect.Contains(current.mousePosition):
+                    GUIUtility.hotControl = controlId;
+                    current.Use();
+                    break;
+
+                case EventType.MouseDrag
+                    when GUIUtility.hotControl == controlId:
+                    heights[row] = ResizeRow(
+                        heights[row],
+                        current.delta.y);
+                    GUI.changed = true;
+                    repaint();
+                    current.Use();
+                    break;
+
+                case EventType.MouseUp
+                    when GUIUtility.hotControl == controlId:
+                case EventType.Ignore
+                    when GUIUtility.hotControl == controlId:
+                    GUIUtility.hotControl = 0;
+                    current.Use();
+                    break;
+            }
+        }
+
+        internal static float ResizeRow(float height, float delta)
+        {
+            return Mathf.Max(
+                MinimumRowHeight,
+                height + delta * ResizeSensitivity);
         }
 
         public static void DrawTabBar(string title)

@@ -12,13 +12,14 @@ namespace Wizard.Editor
         private const int MinimumRowCount = 25;
         private const float RowNumberWidth = 62f;
         private const float DefaultColumnWidth = 140f;
-        private const float RowHeight = 25f;
+        private const float DefaultRowHeight = 25f;
 
         [SerializeField] private GoogleSheetData sheet;
         [SerializeField] private int selectedRow;
         [SerializeField] private int selectedColumn;
         [SerializeField] private string search;
         [SerializeField] private List<float> columnWidths = new();
+        [SerializeField] private List<float> rowHeights = new();
 
         private Vector2 scroll;
 
@@ -117,6 +118,8 @@ namespace Wizard.Editor
 
             Undo.RecordObject(sheet, "Remove sheet row");
             sheet.Rows.RemoveAt(selectedRow);
+            if (selectedRow < rowHeights.Count)
+                rowHeights.RemoveAt(selectedRow);
             selectedRow = Mathf.Clamp(selectedRow, 0, sheet.Rows.Count - 1);
             EditorUtility.SetDirty(sheet);
         }
@@ -134,7 +137,7 @@ namespace Wizard.Editor
             value = EditorGUILayout.TextField(
                 value,
                 GoogleSheetGridGUI.FormulaStyle,
-                GUILayout.Height(RowHeight));
+                GUILayout.Height(DefaultRowHeight));
             if (EditorGUI.EndChangeCheck())
                 SetCellText(selectedRow, selectedColumn, value);
 
@@ -149,17 +152,28 @@ namespace Wizard.Editor
                 columnWidths,
                 columnCount,
                 DefaultColumnWidth);
+            GoogleSheetGridGUI.EnsureRowHeights(
+                rowHeights,
+                rowCount,
+                DefaultRowHeight);
             float width = RowNumberWidth +
                           GoogleSheetGridGUI.GetTotalWidth(
                               columnWidths,
                               columnCount);
-            float height = (rowCount + 1) * RowHeight;
+            float height = DefaultRowHeight +
+                           GoogleSheetGridGUI.GetTotalHeight(
+                               rowHeights,
+                               rowCount);
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
             Rect canvas = GUILayoutUtility.GetRect(width, height);
 
             DrawHeaderCell(
-                new Rect(canvas.x, canvas.y, RowNumberWidth, RowHeight),
+                new Rect(
+                    canvas.x,
+                    canvas.y,
+                    RowNumberWidth,
+                    DefaultRowHeight),
                 string.Empty);
 
             for (int column = 0; column < columnCount; column++)
@@ -182,14 +196,28 @@ namespace Wizard.Editor
 
             for (int row = 0; row < rowCount; row++)
             {
+                float rowY = canvas.y + DefaultRowHeight +
+                             GoogleSheetGridGUI.GetRowOffset(
+                                 rowHeights,
+                                 row);
+                Rect rowRect = new(
+                    canvas.x,
+                    rowY,
+                    width,
+                    rowHeights[row]);
                 GoogleSheetGridGUI.DrawHeaderCell(
                     new Rect(
                         canvas.x,
-                        canvas.y + (row + 1) * RowHeight,
+                        rowY,
                         RowNumberWidth,
-                        RowHeight),
+                        rowHeights[row]),
                     (row + 1).ToString(),
                     row == selectedRow);
+                GoogleSheetGridGUI.HandleRowResize(
+                    rowRect,
+                    row,
+                    rowHeights,
+                    Repaint);
 
                 for (int column = 0; column < columnCount; column++)
                     DrawDataCell(GetCellRect(canvas, row, column), row, column);
@@ -238,12 +266,20 @@ namespace Wizard.Editor
 
         private Rect GetCellRect(Rect canvas, int row, int column)
         {
+            float y = row < 0
+                ? canvas.y
+                : canvas.y + DefaultRowHeight +
+                  GoogleSheetGridGUI.GetRowOffset(rowHeights, row);
+            float height = row < 0
+                ? DefaultRowHeight
+                : rowHeights[row];
+
             return new Rect(
                 canvas.x + RowNumberWidth +
                 GoogleSheetGridGUI.GetColumnOffset(columnWidths, column),
-                canvas.y + (row + 1) * RowHeight,
+                y,
                 columnWidths[column],
-                RowHeight);
+                height);
         }
 
         private int GetDataColumnCount()
