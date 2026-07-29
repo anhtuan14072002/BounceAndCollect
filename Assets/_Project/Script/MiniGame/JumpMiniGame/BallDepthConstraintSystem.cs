@@ -11,6 +11,7 @@ namespace Wizard
     [UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
     public partial struct BallDepthConstraintSystem : ISystem
     {
+        private const float BallDepth = -0.11f;
         private float _ballRadius;
 
         public void OnCreate(ref SystemState state)
@@ -36,22 +37,25 @@ namespace Wizard
                          .Query<RefRW<LocalTransform>, RefRW<PhysicsVelocity>>()
                          .WithAll<BallTag>())
             {
+                float3 position = transform.ValueRO.Position;
+                position.z = BallDepth;
                 velocity.ValueRW.Linear.z = 0f;
 
                 float minX = bounds.MinX + _ballRadius * transform.ValueRO.Scale;
                 float maxX = bounds.MaxX - _ballRadius * transform.ValueRO.Scale;
-                float currentX = transform.ValueRO.Position.x;
 
-                if (currentX < minX)
+                if (position.x < minX)
                 {
-                    transform.ValueRW.Position.x = minX;
+                    position.x = minX;
                     velocity.ValueRW.Linear.x = math.max(0f, velocity.ValueRO.Linear.x);
                 }
-                else if (currentX > maxX)
+                else if (position.x > maxX)
                 {
-                    transform.ValueRW.Position.x = maxX;
+                    position.x = maxX;
                     velocity.ValueRW.Linear.x = math.min(0f, velocity.ValueRO.Linear.x);
                 }
+
+                transform.ValueRW.Position = position;
             }
         }
     }

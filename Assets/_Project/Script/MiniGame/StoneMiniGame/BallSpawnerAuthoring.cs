@@ -79,14 +79,6 @@ namespace Wizard
                     EntityStone = GetEntity(authoring.stonePrefab, TransformUsageFlags.Dynamic),
                     Amount = authoring.amount,
                     ElapsedTime = authoring.elapsedTime,
-                    
-                    MinMapFew = authoring.minMapFew,
-                    MaxMapFew = authoring.maxMapFew,
-                    MinMapMedium = authoring.minMapMedium,
-                    MaxMapMedium = authoring.maxMapMedium,  
-                    MinMapMany = authoring.minMapMany,
-                    MaxMapMany = authoring.maxMapMany,
-                    
                 });
 
                 if (!authoring.trail.Enabled) return;

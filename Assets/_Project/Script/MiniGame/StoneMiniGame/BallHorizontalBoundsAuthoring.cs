@@ -3,12 +3,6 @@ using UnityEngine;
 
 namespace Wizard
 {
-    public struct BallHorizontalBounds : IComponentData
-    {
-        public float MinX;
-        public float MaxX;
-    }
-
     public sealed class BallHorizontalBoundsAuthoring : MonoBehaviour
     {
         [SerializeField] private Transform leftWall;
@@ -20,8 +14,7 @@ namespace Wizard
             {
                 Bounds leftBounds = authoring.leftWall.GetComponent<Renderer>().bounds;
                 Bounds rightBounds = authoring.rightWall.GetComponent<Renderer>().bounds;
-                Debug.Assert(leftBounds.max.x < rightBounds.min.x, "Ball horizontal bounds are invalid.");
-
+                
                 Entity entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, new BallHorizontalBounds
                 {

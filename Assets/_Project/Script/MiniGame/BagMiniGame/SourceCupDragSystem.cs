@@ -9,8 +9,8 @@ namespace Wizard
     {
         public void OnUpdate(ref SystemState state)
         {
-            float minX = -2f;
-            float maxX = 2f;
+            float minX = -4f;
+            float maxX = 4f;
             bool isDragging = Input.GetMouseButton(0);
 
             foreach (var (localTransform, dragBag)

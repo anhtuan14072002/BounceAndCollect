@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics.Stateful;
 using Unity.Physics.Systems;
+using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -36,6 +37,8 @@ namespace Wizard
 
                 padRandom.PadTweenInitialTransform =
                     SystemAPI.GetComponent<LocalTransform>(padRandom.PadTween);
+                padRandom.ResolvedLabelTransform =
+                    SystemAPI.GetComponent<LocalTransform>(padRandom.RandomLabel);
                 padRandom.isInitialized = true;
             }
 
@@ -50,8 +53,7 @@ namespace Wizard
                 for (int i = 0; i < triggerEventsBuffer.Length; i++)
                 {
                     StatefulTriggerEvent triggerEvent = triggerEventsBuffer[i];
-                    if (triggerEvent.State != StatefulEventState.Enter ||
-                        !SystemAPI.HasComponent<BallTag>(triggerEvent.GetOtherEntity(entity))) continue;
+                    if (triggerEvent.State != StatefulEventState.Enter || !SystemAPI.HasComponent<BallTag>(triggerEvent.GetOtherEntity(entity))) continue;
 
                     ResolvePad(ref padRandom, entity, ref ecb);
                     StartTweens(ref padRandom);
@@ -76,15 +78,35 @@ namespace Wizard
                     JumpForceXMin = padRandom.JumpForceXMin,
                     JumpForceXMax = padRandom.JumpForceXMax
                 });
+                SetResolvedVisual(ref padRandom, entity, padRandom.JumpLabel, ref ecb);
                 return;
             }
 
+            int multiplier = random.NextInt(padRandom.MultiplierMin, padRandom.MultiplierMax + 1);
             ecb.AddComponent(entity, new PadMultiplierComponent
             {
                 PadId = padRandom.PadId,
-                MultiNumber = random.NextInt(padRandom.MultiplierMin, padRandom.MultiplierMax + 1), 
+                MultiNumber = multiplier,
                 Radius = padRandom.MultiplierRadius,
                 PadIdMove = -1
+            });
+
+            Entity multiplierLabel = multiplier == 2 ? padRandom.Multiplier2Label : multiplier == 3 ? padRandom.Multiplier3Label : padRandom.Multiplier4Label;
+            SetResolvedVisual(ref padRandom, entity, multiplierLabel, ref ecb);
+        }
+
+        private static void SetResolvedVisual(
+            ref PadRandomComponent padRandom,
+            Entity entity,
+            Entity resolvedLabel,
+            ref EntityCommandBuffer ecb)
+        {
+            ecb.AddComponent<DisableRendering>(padRandom.RandomLabel);
+            ecb.RemoveComponent<DisableRendering>(resolvedLabel);
+            ecb.SetComponent(resolvedLabel, padRandom.ResolvedLabelTransform);
+            ecb.SetComponent(entity, new URPMaterialPropertyBaseColor
+            {
+                Value = padRandom.ResolvedColor
             });
         }
 
@@ -123,8 +145,7 @@ namespace Wizard
 
         private void SetNonUniformScale(Vector3 scale, Entity entity)
         {
-            if (!EntityManager.Exists(entity) ||
-                !EntityManager.HasComponent<PostTransformMatrix>(entity)) return;
+            if (!EntityManager.Exists(entity) || !EntityManager.HasComponent<PostTransformMatrix>(entity)) return;
 
             EntityManager.SetComponentData(entity, new PostTransformMatrix
             {
