@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df53a6fcd80bca5439f62fab19bb1138, type: 3}
+  m_Name: RateSummon
+  m_EditorClassIdentifier: 
+  Rows:
+  - Cells:
+    - ID
+    - Rarity
+    - Level
+    - Rate
+  - Cells:
+    - 60001
+    - Common|Rare|Epic|Legendary
+    - 1
+    - '97.45 | 1.97 | 0.49 | 0.1  '
+  - Cells:
+    - 60002
+    - Common|Rare|Epic|Legendary
+    - 2
+    - '90.07 | 7.23 | 2.25 | 0.48  '
+  - Cells:
+    - 60003
+    - Common|Rare|Epic|Legendary
+    - 3
+    - 82.73 | 11.74 | 3.77 | 0.75
+  - Cells:
+    - 60004
+    - Common|Rare|Epic|Legendary
+    - 4
+    - '78.23 | 15.66 | 5.09 | 1.02 '
+  - Cells:
+    - 60005
+    - Common|Rare|Epic|Legendary
+    - 5
+    - 73.41 | 19.1 | 6.24 | 1.25
+  - Cells:
+    - 60006
+    - Common|Rare|Epic|Legendary
+    - 6
+    - '69.14 | 22.14 | 7.26 | 1.45 '
+  - Cells:
+    - 60007
+    - Common|Rare|Epic|Legendary
+    - 7
+    - '65.35 | 24.85 | 8.17 | 1.63  '
+  - Cells:
+    - 60008
+    - Common|Rare|Epic|Legendary
+    - 8
+    - '61.94 | 27.27 | 8.98 | 1.8 '
+  - Cells:
+    - 60009
+    - Common|Rare|Epic|Legendary
+    - 9
+    - '58.88 | 29.46 | 9.72 | 1.94 '
+  - Cells:
+    - 60010
+    - Common|Rare|Epic|Legendary
+    - 10
+    - 56.11 | 31.44 | 10.38 | 2.08
+  - Cells:
+    - 60011
+    - Common|Rare|Epic|Legendary
+    - 11
+    - '53.58 | 33.24 | 10.98 | 2.2  '
+  - Cells:
+    - 60012
+    - Common|Rare|Epic|Legendary
+    - 12
+    - '51.27 | 34.88 | 11.54 | 2.31  '

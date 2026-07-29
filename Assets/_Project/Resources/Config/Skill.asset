@@ -1,0 +1,232 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df53a6fcd80bca5439f62fab19bb1138, type: 3}
+  m_Name: Skill
+  m_EditorClassIdentifier: 
+  Rows:
+  - Cells:
+    - Id
+    - Name
+    - Rarity
+    - Abilities
+    - Description
+    - Price
+  - Cells:
+    - 1000
+    - Fire
+    - Common
+    - Normal
+    - Fire Common
+    - 50
+  - Cells:
+    - 1001
+    - Fireball Explosion
+    - Rare
+    - Stand
+    - Fireball Explosion Rare
+    - 100
+  - Cells:
+    - 1002
+    - Flame Staff
+    - Epic
+    - Stand
+    - Flame Staff Epic
+    - 150
+  - Cells:
+    - 1003
+    - Meteor Shower
+    - Legendary
+    - Ulti
+    - Meteor Shower Legendary
+    - 200
+  - Cells:
+    - 1004
+    - Stone
+    - Common
+    - Normal
+    - Stone Common
+    - 50
+  - Cells:
+    - 1005
+    - Earthquake
+    - Rare
+    - Stand
+    - Earthquake Rare
+    - 100
+  - Cells:
+    - 1006
+    - Stone Shield
+    - Epic
+    - Stand
+    - Stone Shield Epic
+    - 150
+  - Cells:
+    - 1007
+    - Hailstorm
+    - Legendary
+    - Ulti
+    - Hailstorm Legendary
+    - 200
+  - Cells:
+    - 1008
+    - Whirlwind
+    - Epic
+    - Stand
+    - Whirlwind Epic
+    - 150
+  - Cells:
+    - 1009
+    - Wind Vortex
+    - Epic
+    - Stand
+    - Wind Vortex Epic
+    - 150
+  - Cells:
+    - 1010
+    - Wind Blast"
+    - Epic
+    - Stand
+    - Wind Blast" Epic
+    - 150
+  - Cells:
+    - 1011
+    - Electric
+    - Common
+    - Normal
+    - Electric Common
+    - 50
+  - Cells:
+    - 1012
+    - Electric Ball
+    - Rare
+    - Stand
+    - Electric Ball Rare
+    - 100
+  - Cells:
+    - 1013
+    - Thunder Strike
+    - Epic
+    - Stand
+    - Thunder Strike Epic
+    - 150
+  - Cells:
+    - 1014
+    - Thunderstorm
+    - Legendary
+    - Ulti
+    - Thunderstorm Legendary
+    - 200
+  - Cells:
+    - 1015
+    - Frost
+    - Common
+    - Normal
+    - Frost Common
+    - 50
+  - Cells:
+    - 1016
+    - Hailstorm
+    - Rare
+    - Stand
+    - Hailstorm Rare
+    - 100
+  - Cells:
+    - 1017
+    - Ice Wall
+    - Epic
+    - Stand
+    - Ice Wall Epic
+    - 150
+  - Cells:
+    - 1018
+    - Ice Spikes
+    - Legendary
+    - Ulti
+    - Ice Spikes Legendary
+    - 200
+  - Cells:
+    - 1019
+    - Water
+    - Common
+    - Normal
+    - Water Common
+    - 50
+  - Cells:
+    - 1020
+    - 'Water Orb '
+    - Rare
+    - Stand
+    - Water Orb  Rare
+    - 100
+  - Cells:
+    - 1021
+    - Water Vortex
+    - Epic
+    - Stand
+    - Water Vortex Epic
+    - 150
+  - Cells:
+    - 1022
+    - Ultimate Tornado
+    - Legendary
+    - Ulti
+    - Ultimate Tornado Legendary
+    - 200
+  - Cells:
+    - 1023
+    - Poison Orb
+    - Epic
+    - Stand
+    - Poison Orb Epic
+    - 150
+  - Cells:
+    - 1024
+    - Light Sword
+    - Epic
+    - Stand
+    - Light Sword Epic
+    - 150
+  - Cells:
+    - 1025
+    - Light Burst
+    - Epic
+    - Stand
+    - Light Burst Epic
+    - 150
+  - Cells:
+    - 1026
+    - Light Dragon
+    - Legendary
+    - Ulti
+    - Light Dragon Legendary
+    - 200
+  - Cells:
+    - 1027
+    - Dark Sword
+    - Epic
+    - Stand
+    - Dark Sword Epic
+    - 150
+  - Cells:
+    - 1028
+    - Chains of Darkness
+    - Epic
+    - Stand
+    - Chains of Darkness Epic
+    - 150
+  - Cells:
+    - 1029
+    - Soul Summoning
+    - Legendary
+    - Ulti
+    - Soul Summoning Legendary
+    - 200
