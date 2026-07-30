@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Wizard
+namespace Sheet
 {
     [Serializable]
     public sealed class GoogleSheetDataRow

@@ -35,6 +35,13 @@
       "dependencies": {},
       "hash": "ceac8d6946b1125fe782cd171fbcb245b567dbf9"
     },
+    "com.tuna.custom": {
+      "version": "https://github.com/anhtuan14072002/Core.git?path=/com.tuna.custom",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5c6ff930cbb8d3bdf1a51bb381b085c82eee5a4e"
+    },
     "com.tuna.package-installer": {
       "version": "https://github.com/anhtuan14072002/Core.git?path=/com.tuna.package-installer",
       "depth": 0,

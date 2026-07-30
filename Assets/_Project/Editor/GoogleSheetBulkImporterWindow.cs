@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Wizard.Editor
+namespace Sheet.Editor
 {
     public sealed class GoogleSheetBulkImporterWindow : EditorWindow
     {

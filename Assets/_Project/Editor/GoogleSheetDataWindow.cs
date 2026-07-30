@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace Wizard.Editor
+namespace Sheet.Editor
 {
     public sealed class GoogleSheetDataWindow : EditorWindow
     {
