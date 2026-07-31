@@ -5,11 +5,11 @@ using Wizard;
 namespace Sheet
 {
     public sealed class RateSummonConfig
-    {
+    { 
         [DataSheet(0)] public int Id;
-        [DataSheet(1)] internal SkillRarity[] Rarities;
+        [DataSheet(1)] public SkillRarity[] Rarity;
         [DataSheet(2)] public int Level;
-        [DataSheet(3)] internal float[] Rates;
+        [DataSheet(3)] public float[] Rate;
     }
 
     public static partial class SheetConfig
@@ -21,17 +21,14 @@ namespace Sheet
             return RateSummonCache.LoadConfigRateTable.GetByOrder(order).Level;
         }
 
-        public static float GetRateSummon(
-            int order,
-            SkillRarity rarity)
+        public static float GetRateSummon(int order, SkillRarity rarity)
         {
-            RateSummonConfig config =
-                RateSummonCache.LoadConfigRateTable.GetByOrder(order);
+            RateSummonConfig config = RateSummonCache.LoadConfigRateTable.GetByOrder(order);
 
-            for (int i = 0; i < config.Rarities.Length; i++)
+            for (int i = 0; i < config.Rarity.Length; i++)
             {
-                if (config.Rarities[i] == rarity)
-                    return config.Rates[i];
+                if (config.Rarity[i] == rarity)
+                    return config.Rate[i];
             }
 
             throw new KeyNotFoundException(
@@ -41,23 +38,22 @@ namespace Sheet
 
         private static SheetTable<RateSummonConfig> LoadRateSummons()
         {
-            SheetTable<RateSummonConfig> table =
-                LoadConfig<RateSummonConfig>("RateSummon");
+            SheetTable<RateSummonConfig> table = LoadConfig<RateSummonConfig>("RateSummon");
 
             for (int i = 0; i < table.Count; i++)
             {
                 RateSummonConfig config = table[i];
-                if (config.Rarities.Length != config.Rates.Length)
+                if (config.Rarity.Length != config.Rate.Length)
                 {
                     throw new InvalidOperationException($"RateSummon Id {config.Id} has different " + "rarity and rate counts.");
                 }
 
                 var rarities = new HashSet<SkillRarity>();
-                for (int j = 0; j < config.Rarities.Length; j++)
+                for (int j = 0; j < config.Rarity.Length; j++)
                 {
-                    if (!rarities.Add(config.Rarities[j]))
+                    if (!rarities.Add(config.Rarity[j]))
                     {
-                        throw new InvalidOperationException($"RateSummon Id {config.Id} contains duplicate " + $"rarity '{config.Rarities[j]}'.");
+                        throw new InvalidOperationException($"RateSummon Id {config.Id} contains duplicate " + $"rarity '{config.Rarity[j]}'.");
                     }
                 }
             }

@@ -1,7 +1,6 @@
-using Sheet;
 using Wizard;
 
-namespace Wizard
+namespace Sheet
 {
     public sealed class SkillConfig
     {
@@ -12,10 +11,7 @@ namespace Wizard
         [DataSheet(4)] public string Description;
         [DataSheet(5)] public int Price;
     }
-}
 
-namespace Sheet
-{
     public static partial class SheetConfig
     {
         public static SheetTable<SkillConfig> LoadConfigSkills => LoadConfig<SkillConfig>("Skill");
